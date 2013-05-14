@@ -8,13 +8,16 @@ namespace RapidRegex.Core
 
         public RegexAliasResolver(RegexAlias[] regexAliases)
         {
-            _aliases = regexAliases;
+            _aliases = regexAliases ?? new RegexAlias[0];
         }
 
         public string ResolveToRegex(string aliasedPattern)
         {
             foreach (var alias in _aliases)
             {
+                if (alias == null)
+                    continue;
+
                 var replacePattern = "%{" + alias.Name + "}";
                 aliasedPattern = Regex.Replace(aliasedPattern, replacePattern, alias.RegexPattern);
             }
