@@ -19,7 +19,7 @@ namespace RapidRegex.Tests
             };
 
             var resolver = new RegexAliasResolver(new[] {alias});
-            var pattern = resolver.ConvertToRegex(inputPattern);
+            var pattern = resolver.ResolveToRegex(inputPattern);
 
             Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
         }
@@ -43,7 +43,7 @@ namespace RapidRegex.Tests
             };
 
             var resolver = new RegexAliasResolver(new[] { alias, alias2 });
-            var pattern = resolver.ConvertToRegex(inputPattern);
+            var pattern = resolver.ResolveToRegex(inputPattern);
 
             Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
         }

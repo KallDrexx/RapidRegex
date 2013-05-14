@@ -11,7 +11,7 @@ namespace RapidRegex.Core
             _aliases = regexAliases;
         }
 
-        public string ConvertToRegex(string aliasedPattern)
+        public string ResolveToRegex(string aliasedPattern)
         {
             foreach (var alias in _aliases)
             {
