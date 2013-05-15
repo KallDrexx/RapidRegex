@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using RapidRegex.Core;
 
@@ -178,6 +179,88 @@ namespace RapidRegex.Tests
             };
 
             new RegexAliasResolver(new[] {alias, alias2, alias3});
+        }
+
+        [Test]
+        public void Can_Resolve_Dependent_Aliases_With_Multiple_References_To_The_Same_Alias()
+        {
+            const string inputPattern = "%{test1}";
+            const string expectedResult = "abcabc";
+
+            var alias = new RegexAlias
+            {
+                Name = "test1",
+                RegexPattern = @"%{test2}%{test2}"
+            };
+
+            var alias2 = new RegexAlias
+            {
+                Name = "test2",
+                RegexPattern = @"abc"
+            };
+
+            var resolver = new RegexAliasResolver(new[] { alias, alias2 });
+            var pattern = resolver.ResolveToRegex(inputPattern);
+
+            Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
+        }
+
+        [Test]
+        public void IP_Address_Test()
+        {
+            var alias = new RegexAlias
+            {
+                Name = "IPAddress",
+                RegexPattern = @"\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
+            };
+
+            var resolver = new RegexAliasResolver(new[] { alias });
+
+            const string pattern = "connection from %{IPAddress}";
+            const string test1 = "connection from 192.168.0.1";
+            const string test2 = "connection from 555.555.555.555";
+            
+            // Resolve the pattern into becomes "connection from \b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
+            var regexPattern = resolver.ResolveToRegex(pattern);
+
+            // Run the regex
+            var match1 = Regex.Match(test1, regexPattern);
+            var match2 = Regex.Match(test2, regexPattern);
+
+            Assert.IsTrue(match1.Success);
+            Assert.IsFalse(match2.Success);
+        }
+
+        [Test]
+        public void Chained_IP_Address_Test1()
+        {
+            var alias = new RegexAlias
+            {
+                Name = "IPDigit",
+                RegexPattern = @"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"
+            };
+
+            var alias2 = new RegexAlias
+            {
+                Name = "IPAddress",
+                RegexPattern = @"%{IPDigit}\.%{IPDigit}\.%{IPDigit}\.%{IPDigit}"
+            };
+
+            var resolver = new RegexAliasResolver(new[] { alias, alias2 });
+
+            const string pattern = "connection from %{IPAddress}";
+            const string test1 = "connection from 192.168.0.1";
+            const string test2 = "connection from 555.555.555.555";
+
+            // Resolve the pattern into becomes "connection from \b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
+            var regexPattern = resolver.ResolveToRegex(pattern);
+
+            // Run the regex
+            var match1 = Regex.Match(test1, regexPattern);
+            var match2 = Regex.Match(test2, regexPattern);
+
+            Assert.IsTrue(match1.Success);
+            Assert.IsFalse(match2.Success);
         }
     }
 }

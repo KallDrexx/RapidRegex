@@ -7,6 +7,8 @@ namespace RapidRegex.Core
 {
     public class RegexAliasResolver
     {
+        private const string AliasPattern = @"%{\w+}";
+
         private readonly RegexAlias[] _aliases;
 
         public RegexAliasResolver(RegexAlias[] regexAliases)
@@ -34,20 +36,16 @@ namespace RapidRegex.Core
 
         private void ComputeRawRegex(RegexAlias alias, List<RegexAlias> computedAliases)
         {
-            const string aliasPattern = @"%{\w+}";
-
             // Add this as a computed dependency to detect circular dependencies
             computedAliases.Add(alias);
 
-            var matches = Regex.Matches(alias.RegexPattern, aliasPattern);
-            foreach (var match in matches.Cast<Match>())
+            foreach (var subAliasName in GetSubAliasNames(alias))
             {
-                // Extract the name from the alias
-                var name = match.Value.Substring(2, match.Value.Length - 3);
+                var matchName = string.Concat("%{", subAliasName, "}");
 
                 // Find an alias with the specified name and put its 
                 //   regex pattern into the current alias' pattern
-                var subAlias = _aliases.FirstOrDefault(x => x.Name == name);
+                var subAlias = _aliases.FirstOrDefault(x => x.Name == subAliasName);
                 if (subAlias != null)
                 {
                     // If the subAlias has already been computed this run,
@@ -57,9 +55,17 @@ namespace RapidRegex.Core
 
                     // Compute the sub alias' regex
                     ComputeRawRegex(subAlias, computedAliases);
-                    alias.RegexPattern = alias.RegexPattern.Replace(match.Value, subAlias.RegexPattern);
+                    alias.RegexPattern = alias.RegexPattern.Replace(matchName, subAlias.RegexPattern);
                 }
             }
+        }
+
+        private IEnumerable<string> GetSubAliasNames(RegexAlias alias)
+        {
+            return Regex.Matches(alias.RegexPattern, AliasPattern)
+                        .Cast<Match>()
+                        .Select(x => x.Value.Substring(2, x.Value.Length - 3))
+                        .Distinct();
         }
     }
 }
