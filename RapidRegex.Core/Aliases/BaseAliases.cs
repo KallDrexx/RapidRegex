@@ -80,7 +80,6 @@
                     // Paths
                     new RegexAlias {Name = "PATH", RegexPattern = @"(?:%{UNIXPATH}|%{WINPATH})"},
                     new RegexAlias {Name = "UNIXPATH", RegexPattern = @"(?<![\w\\/])(?:/(?:[\w_%!$@:.,-]+|\\.)*)+"},
-                    new RegexAlias {Name = "#UNIXPATH", RegexPattern = @"(?<![\w\/])(?:/[^\/\s?*]*)+"},
                     new RegexAlias {Name = "LINUXTTY", RegexPattern = @"(?:/dev/pts/%{POSINT})"},
                     new RegexAlias {Name = "BSDTTY", RegexPattern = @"(?:/dev/tty[pq][a-z0-9])"},
                     new RegexAlias {Name = "TTY", RegexPattern = @"(?:%{BSDTTY}|%{LINUXTTY})"},
