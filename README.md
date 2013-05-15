@@ -7,7 +7,8 @@ to create an aliased regular expression pattern, that will resolve to a real reg
 to be used against C#'s Regex engine.
 
 This project was inspired by [Grok](https://code.google.com/p/semicomplete/wiki/Grok).  I wanted to use Grok-like
-syntax for regular expressions in an Asp.Net web site and did not find an alternative that would work in .Net, so I created one.
+syntax for regular expressions in an Asp.Net web site and did not find an alternative that would work in .Net, 
+so I created one.
 
 The power of this library is to make it easy for end users to create regular expressions to 
 perform tasks without deep knowledge of regular expressions, and without being able to read and repeat complicated 
@@ -79,3 +80,17 @@ period in front of them, such as:
     Assert.IsTrue(match1.Success);
     Assert.IsFalse(match2.Success);
 	
+Defaults
+--------
+
+RapidRegex comes with a set of base aliases that can be used if desired.  The base
+aliases must be explicitely enabled, so to use them you can instantiate a resolver
+like so:
+
+	var resolver = new RegexAliasResolver(BaseAliases.All);
+
+If you want to use custom aliases alongside base aliases, you can do that by
+concatenating the custom aliases with the base aliases like:
+
+    var aliases = BaseAliases.All.Concat(new[] {alias, alias2});
+    var testing = new RegexAliasResolver(aliases);

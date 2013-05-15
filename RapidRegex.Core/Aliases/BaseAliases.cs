@@ -1,8 +1,8 @@
 ﻿namespace RapidRegex.Core.Aliases
 {
-    public static class Base
+    public static class BaseAliases
     {
-        public static RegexAlias[] Aliases
+        public static RegexAlias[] All
         {
             get
             {
@@ -27,7 +27,7 @@
                         RegexPattern = @"([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})"
                     },
 
-                    // Aliases below taken from https://github.com/jordansissel/grok/blob/master/patterns/base
+                    // All below taken from https://github.com/jordansissel/grok/blob/master/patterns/base
                     //  Copyright (c) 2007, Jordan Sissel.
                     new RegexAlias {Name = "USERNAME", RegexPattern = @"[a-zA-Z0-9_-]+"},
                     new RegexAlias {Name = "USER", RegexPattern = @"%{USERNAME}"},

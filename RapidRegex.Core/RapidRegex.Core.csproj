@@ -39,7 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Aliases\Base.cs" />
+    <Compile Include="Aliases\BaseAliases.cs" />
     <Compile Include="RegexAlias.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegexAliasResolver.cs" />

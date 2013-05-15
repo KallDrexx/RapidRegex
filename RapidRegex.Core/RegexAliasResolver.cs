@@ -11,7 +11,7 @@ namespace RapidRegex.Core
 
         private readonly RegexAlias[] _aliases;
 
-        public RegexAliasResolver(RegexAlias[] regexAliases)
+        public RegexAliasResolver(IEnumerable<RegexAlias> regexAliases)
         {
             _aliases = (regexAliases ?? new RegexAlias[0]).Where(x => x != null).ToArray();
             CompileDependentAliases();
