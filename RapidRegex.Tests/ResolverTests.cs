@@ -206,6 +206,42 @@ namespace RapidRegex.Tests
         }
 
         [Test]
+        public void Can_Resolve_Dependent_Aliases_With_Diamond_Dependencies()
+        {
+            const string inputPattern = "%{test1}";
+            const string expectedResult = "abcabc";
+
+            var alias = new RegexAlias
+            {
+                Name = "test1",
+                RegexPattern = @"%{test2}%{test3}"
+            };
+
+            var alias2 = new RegexAlias
+            {
+                Name = "test2",
+                RegexPattern = @"%{test4}"
+            };
+
+            var alias3 = new RegexAlias
+            {
+                Name = "test3",
+                RegexPattern = @"%{test4}"
+            };
+
+            var alias4 = new RegexAlias
+            {
+                Name = "test4",
+                RegexPattern = @"abc"
+            };
+
+            var resolver = new RegexAliasResolver(new[] { alias, alias2, alias3, alias4 });
+            var pattern = resolver.ResolveToRegex(inputPattern);
+
+            Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
+        }
+
+        [Test]
         public void IP_Address_Test()
         {
             var alias = new RegexAlias

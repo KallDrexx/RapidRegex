@@ -54,7 +54,7 @@ namespace RapidRegex.Core
                         throw new InvalidOperationException("Circular dependency detected while computing alias dependencies");
 
                     // Compute the sub alias' regex
-                    ComputeRawRegex(subAlias, computedAliases);
+                    ComputeRawRegex(subAlias, computedAliases.ToList());
                     alias.RegexPattern = alias.RegexPattern.Replace(matchName, subAlias.RegexPattern);
                 }
             }
