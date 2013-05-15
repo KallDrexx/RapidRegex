@@ -261,6 +261,48 @@ namespace RapidRegex.Tests
         }
 
         [Test]
+        public void Aliases_Are_Case_Insensitive()
+        {
+            const string inputPattern = "%{NUMBERS}";
+            const string expectedResult = "[0-9]+";
+
+            var alias = new RegexAlias
+            {
+                Name = "numbers",
+                RegexPattern = @"[0-9]+"
+            };
+
+            var resolver = new RegexAliasResolver(new[] { alias });
+            var pattern = resolver.ResolveToRegex(inputPattern);
+
+            Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
+        }
+
+        [Test]
+        public void Aliases_Can_Refer_To_Other_Aliases_With_Case_Insensitivity()
+        {
+            const string inputPattern = "%{test1}";
+            const string expectedResult = "[0-9]+";
+
+            var alias = new RegexAlias
+            {
+                Name = "test1",
+                RegexPattern = @"%{TEST2}"
+            };
+
+            var alias2 = new RegexAlias
+            {
+                Name = "test2",
+                RegexPattern = @"[0-9]+"
+            };
+
+            var resolver = new RegexAliasResolver(new[] { alias2, alias });
+            var pattern = resolver.ResolveToRegex(inputPattern);
+
+            Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
+        }
+
+        [Test]
         public void IP_Address_Test()
         {
             var alias = new RegexAlias

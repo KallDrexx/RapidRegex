@@ -22,7 +22,7 @@ namespace RapidRegex.Core
             foreach (var alias in _aliases)
             {
                 var replacePattern = "%{" + alias.Name + "}";
-                aliasedPattern = Regex.Replace(aliasedPattern, replacePattern, alias.RegexPattern);
+                aliasedPattern = Regex.Replace(aliasedPattern, replacePattern, alias.RegexPattern, RegexOptions.IgnoreCase);
             }
 
             return aliasedPattern;
@@ -51,7 +51,7 @@ namespace RapidRegex.Core
 
                 // Find an alias with the specified name and put its 
                 //   regex pattern into the current alias' pattern
-                var subAlias = _aliases.FirstOrDefault(x => x.Name == subAliasName);
+                var subAlias = _aliases.FirstOrDefault(x => x.Name.Equals(subAliasName, StringComparison.InvariantCultureIgnoreCase));
                 if (subAlias != null)
                 {
                     // If the subAlias has already been computed this run,
