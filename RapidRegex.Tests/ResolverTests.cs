@@ -154,5 +154,30 @@ namespace RapidRegex.Tests
 
             Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
         }
+
+        [Test]
+        [ExpectedException(typeof (InvalidOperationException))]
+        public void Exception_Thrown_When_Circular_Alias_Dependency_Exists()
+        {
+            var alias = new RegexAlias
+            {
+                Name = "test1",
+                RegexPattern = @"%{test2}"
+            };
+
+            var alias2 = new RegexAlias
+            {
+                Name = "test2",
+                RegexPattern = @"%{test3}"
+            };
+
+            var alias3 = new RegexAlias
+            {
+                Name = "test3",
+                RegexPattern = @"%{test1}"
+            };
+
+            new RegexAliasResolver(new[] {alias, alias2, alias3});
+        }
     }
 }
