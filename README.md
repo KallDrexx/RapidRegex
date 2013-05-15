@@ -47,7 +47,7 @@ Now that we have a resolver we are able to convert patterns containing aliases i
     Assert.IsTrue(match1.Success);
     Assert.IsFalse(match2.Success);
 
-However, aliases are chainable to allow the breaking down of complicated regular expressions.
+Aliases are chainable to allow the breaking down of complicated regular expressions into smaller pieces.
 To keep this example going, we can define an IP address as 4 sets of digits (between 0-255) with a 
 period in front of them, such as:
 
