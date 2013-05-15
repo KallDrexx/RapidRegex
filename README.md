@@ -7,7 +7,7 @@ to create an aliased regular expression pattern, that will resolve to a real reg
 to be used against C#'s Regex engine.
 
 This project was inspired by [Grok](https://code.google.com/p/semicomplete/wiki/Grok).  I wanted to use Grok-like
-syntax for regular expressions in an Asp.Net web site, and found not alternative, so I created one.
+syntax for regular expressions in an Asp.Net web site and did not find an alternative that would work in .Net, so I created one.
 
 The power of this library is to make it easy for end users to create regular expressions to 
 perform tasks without deep knowledge of regular expressions, and without being able to read and repeat complicated 
