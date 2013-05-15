@@ -88,5 +88,35 @@ namespace RapidRegex.Tests
 
             Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
         }
+
+        [Test]
+        public void Can_Resolve_Dependent_Aliases()
+        {
+            const string inputPattern = "%{characters}";
+            const string expectedResult = "[a-z]+[0-9]+";
+
+            var alias = new RegexAlias
+            {
+                Name = "numbers",
+                RegexPattern = @"[0-9]+"
+            };
+
+            var alias2 = new RegexAlias
+            {
+                Name = "letters",
+                RegexPattern = @"[a-z]+"
+            };
+
+            var alias3 = new RegexAlias
+            {
+                Name = "characters",
+                RegexPattern = "%{letters}%{numbers}"
+            };
+
+            var resolver = new RegexAliasResolver(new[] { alias, alias2, alias3 });
+            var pattern = resolver.ResolveToRegex(inputPattern);
+
+            Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
+        }
     }
 }
