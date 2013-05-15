@@ -31,7 +31,13 @@ namespace RapidRegex.Core
         private void CompileDependentAliases()
         {
             foreach (var alias in _aliases)
+            {
+                // Make sure another alias with this name does not exist
+                if (_aliases.Count(x => x.Name == alias.Name) > 1)
+                    throw new InvalidOperationException("Multiple aliases exist with the name: " + alias.Name);
+
                 ComputeRawRegex(alias, new List<RegexAlias>());
+            }
         }
 
         private void ComputeRawRegex(RegexAlias alias, List<RegexAlias> computedAliases)

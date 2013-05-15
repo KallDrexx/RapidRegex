@@ -242,6 +242,25 @@ namespace RapidRegex.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void Exception_Thrown_When_Multiple_Aliases_Have_The_Same_Name()
+        {
+            var alias = new RegexAlias
+            {
+                Name = "test1",
+                RegexPattern = @"%{test2}%{test2}"
+            };
+
+            var alias2 = new RegexAlias
+            {
+                Name = "test1",
+                RegexPattern = @"abc"
+            };
+
+            new RegexAliasResolver(new[] { alias, alias2 });
+        }
+
+        [Test]
         public void IP_Address_Test()
         {
             var alias = new RegexAlias
