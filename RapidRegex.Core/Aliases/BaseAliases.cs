@@ -11,7 +11,7 @@
                     new RegexAlias
                     {
                         Name = "HEX",
-                        RegexPattern = @"\b#?([a-f0-9]{6}|[a-f0-9]{3})\b"
+                        RegexPattern = @"#?([a-f0-9]{6}|[a-f0-9]{3})"
                     },
 
                     new RegexAlias
