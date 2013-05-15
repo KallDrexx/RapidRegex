@@ -118,5 +118,41 @@ namespace RapidRegex.Tests
 
             Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
         }
+
+        [Test]
+        public void Can_Resolve_Deep_Dependent_Aliases()
+        {
+            const string inputPattern = "%{test2}";
+            const string expectedResult = "abcdefg";
+
+            var alias = new RegexAlias
+            {
+                Name = "test1",
+                RegexPattern = @"%{test3}"
+            };
+
+            var alias2 = new RegexAlias
+            {
+                Name = "test2",
+                RegexPattern = @"%{test1}%{test4}"
+            };
+
+            var alias3 = new RegexAlias
+            {
+                Name = "test3",
+                RegexPattern = "abcd"
+            };
+
+            var alias4 = new RegexAlias
+            {
+                Name = "test4",
+                RegexPattern = "efg"
+            };
+
+            var resolver = new RegexAliasResolver(new[] { alias, alias2, alias3, alias4 });
+            var pattern = resolver.ResolveToRegex(inputPattern);
+
+            Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
+        }
     }
 }

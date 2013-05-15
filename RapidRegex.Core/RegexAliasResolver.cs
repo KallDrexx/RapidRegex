@@ -26,21 +26,28 @@ namespace RapidRegex.Core
 
         private void CompileDependentAliases()
         {
+            foreach (var alias in _aliases)
+                ComputeRawRegex(alias);
+        }
+
+        private void ComputeRawRegex(RegexAlias alias)
+        {
             const string aliasPattern = @"%{\w+}";
 
-            foreach (var alias in _aliases)
+            var matches = Regex.Matches(alias.RegexPattern, aliasPattern);
+            foreach (var match in matches.Cast<Match>())
             {
-                var matches = Regex.Matches(alias.RegexPattern, aliasPattern);
-                foreach (var match in matches.Cast<Match>())
+                // Extract the name from the alias
+                var name = match.Value.Substring(2, match.Value.Length - 3);
+
+                // Find an alias with the specified name and put its 
+                //   regex pattern into the current alias' pattern
+                var subAlias = _aliases.FirstOrDefault(x => x.Name == name);
+                if (subAlias != null)
                 {
-                    // Extract the name from the alias
-                    var name = match.Value.Substring(2, match.Value.Length - 3);
-                    
-                    // Find an alias with the specified name and put its 
-                    //   regex pattern into the current alias' pattern
-                    var subAlias = _aliases.FirstOrDefault(x => x.Name == name);
-                    if (subAlias != null)
-                        alias.RegexPattern = alias.RegexPattern.Replace(match.Value, subAlias.RegexPattern);
+                    // Make sure the pattern for this regex is already computed
+                    ComputeRawRegex(subAlias);
+                    alias.RegexPattern = alias.RegexPattern.Replace(match.Value, subAlias.RegexPattern);
                 }
             }
         }
