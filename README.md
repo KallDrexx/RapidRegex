@@ -79,83 +79,27 @@ period in front of them, such as:
 
     Assert.IsTrue(match1.Success);
     Assert.IsFalse(match2.Success);
-	
-Defaults
---------
 
-RapidRegex comes with a set of base aliases that can be used if desired.  The base
-aliases must be explicitely enabled, so to use them you can instantiate a resolver
-like so:
+Alias Configuration
+-------------------
 
-	var resolver = new RegexAliasResolver(BaseAliases.All);
+RapidRegex requires you to build `RegexAlias` data structures in order to define the different
+aliases it will parse.  It does not force you a specific format for how to form these data structures.  
+This gives you the flexibility in how you store and edit aliases.  For example, you could store
+them in a database (for editing via a web page) or even to form a centralized web service 
+that can be called to retrieve the `RegexAlias` structures.
 
-If you want to use custom aliases alongside base aliases, you can do that by
-concatenating the custom aliases with the base aliases like:
+To make it easier to get up and running, the project includes a `BasicAliasConfigReader` class,
+which allows you to read a basic alias configuration from a file or a stream.  The basic alias
+configuration format is:
 
-    var aliases = BaseAliases.All.Concat(new[] {alias, alias2});
-    var testing = new RegexAliasResolver(aliases);
+    # This is a Comment
+    AliasName My Regex Pattern
+    SecondAlias [a-z]+
 
-The default aliases include:
+The first character of a valid alias must not be a space, and the alias name must be one word
+with no spaces in between.  All characters after the first space in the line will be counted
+as part of the regular expression pattern.  It allows one alias per line.
 
-    HEX \b#?([a-f0-9]{6}|[a-f0-9]{3})\b
-    Email ([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})
+RapidRegex comes with a set of basic alias configurations.  
 
-The following aliases were pulled from grok's base and are usable in RapidRegex
-
-    USERNAME [a-zA-Z0-9_-]+
-    USER %{USERNAME}
-    INT (?:[+-]?(?:[0-9]+))
-    BASE10NUM (?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\.[0-9]+)?)|(?:\.[0-9]+)))
-    NUMBER (?:%{BASE10NUM})
-    BASE16NUM (?<![0-9A-Fa-f])(?:[+-]?(?:0x)?(?:[0-9A-Fa-f]+))
-    BASE16FLOAT \b(?<![0-9A-Fa-f.])(?:[+-]?(?:0x)?(?:(?:[0-9A-Fa-f]+(?:\.[0-9A-Fa-f]*)?)|(?:\.[0-9A-Fa-f]+)))\bPOSINT \b(?:[0-9]+)\b
-    WORD \b\w+\b
-    NOTSPACE \S+
-    SPACE \s*
-    DATA .*?
-    GREEDYDATA .*
-    QUOTEDSTRING (?:(?<!\\)(?:"(?:\\.|[^\\"])*"|(?:'(?:\\.|[^\\'])*')|(?:`(?:\\.|[^\\`])*`)))
-    MAC (?:%{CISCOMAC}|%{WINDOWSMAC}|%{COMMONMAC})
-    CISCOMAC (?:(?:[A-Fa-f0-9]{4}\.){2}[A-Fa-f0-9]{4})
-    WINDOWSMAC (?:(?:[A-Fa-f0-9]{2}-){5}[A-Fa-f0-9]{2})
-    COMMONMAC (?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})
-    IP (?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9])
-    HOSTNAME \b(?:[0-9A-Za-z][0-9A-Za-z-]{0,62})(?:\.(?:[0-9A-Za-z][0-9A-Za-z-]{0,62}))*(\.?|\b)
-    HOST %{HOSTNAME}
-    IPORHOST (?:%{HOSTNAME}|%{IP})
-    HOSTPORT (?:%{IPORHOST=~/\./}:%{POSINT})
-    PATH (?:%{UNIXPATH}|%{WINPATH})
-    UNIXPATH (?<![\w\\/])(?:/(?:[\w_%!$@:.,-]+|\\.)*)+LINUXTTY (?:/dev/pts/%{POSINT})
-    BSDTTY (?:/dev/tty[pq][a-z0-9])
-    TTY (?:%{BSDTTY}|%{LINUXTTY})
-    WINPATH (?:[A-Za-z]+:|\\)(?:\\[^\\?*]*)+
-    URIPROTO [A-Za-z]+(\+[A-Za-z+]+)?
-    URIHOST %{IPORHOST}(?::%{POSINT:port})?
-    URIPATH (?:/[A-Za-z0-9$.+!*'(),~:URIPARAM \?[A-Za-z0-9$.+!*'(),~
-    URIPATHPARAM %{URIPATH}(?:%{URIPARAM})?
-    URI %{URIPROTO}://(?:%{USER}(?::[^@]*)?@)?(?:%{URIHOST})?(?:%{URIPATHPARAM})?
-    MONTH \b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\b
-    MONTHNUM (?:0?[1-9]|1[0-2])
-    MONTHDAY (?:3[01]|[1-2]?[0-9]|0?[1-9])
-    DAY (?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)
-    YEAR [0-9]+HOUR (?:2[0123]|[01][0-9])
-    MINUTE (?:[0-5][0-9])SECOND (?:(?:[0-5][0-9]|60)(?:[.,][0-9]+)?)
-    TIME (?!<[0-9])%{HOUR}:%{MINUTE}(?::%{SECOND})(?![0-9])DATE_US %{MONTHNUM}[/-]%{MONTHDAY}[/-]%{YEAR}
-    DATE_EU %{YEAR}[/-]%{MONTHNUM}[/-]%{MONTHDAY}
-    ISO8601_TIMEZONE (?:Z|[+-]%{HOUR}(?::?%{MINUTE}))
-    ISO8601_SECOND (?:%{SECOND}|60)
-    TIMESTAMP_ISO8601 %{YEAR}-%{MONTHNUM}-%{MONTHDAY}[T ]%{HOUR}:?%{MINUTE}(?::?%{SECOND})?%{ISO8601_TIMEZONE}?
-    DATE %{DATE_US}|%{DATE_EU}
-    DATESTAMP %{DATE}[- ]%{TIME}
-    TZ (?:[PMCE][SD]T)
-    DATESTAMP_RFC822 %{DAY} %{MONTH} %{MONTHDAY} %{YEAR} %{TIME} %{TZ}
-    DATESTAMP_OTHER %{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{TZ} %{YEAR}
-    SYSLOGTIMESTAMP %{MONTH} +%{MONTHDAY} %{TIME}
-    PROG (?:[\w._/-]+)
-    SYSLOGPROG %{PROG:program}(?:\[%{POSINT:pid}\])?
-    SYSLOGHOST %{IPORHOST}
-    SYSLOGFACILITY <%{POSINT:facility}.%{POSINT:priority}>
-    HTTPDATE %{MONTHDAY}/%{MONTH}/%{YEAR}:%{TIME} %{INT:ZONE}
-    QS %{QUOTEDSTRING}
-    SYSLOGBASE %{SYSLOGTIMESTAMP:timestamp} (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource} %{SYSLOGPROG}:
-    COMBINEDAPACHELOG %{IPORHOST:clientip} %{USER:ident} %{USER:auth} \[%{HTTPDATE:timestamp}\] "%{WORD:verb} %{URIPATHPARAM:request} HTTP/%{NUMBER:httpversion}" %{NUMBER:response} (?:%{NUMBER:bytes}|-) (?:"(?:%{URI:referrer}|-)"|%{QS:referrer}) %{QS:agent}
