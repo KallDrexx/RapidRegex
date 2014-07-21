@@ -5,6 +5,20 @@ using System.Text.RegularExpressions;
 
 namespace RapidRegex.Core
 {
+    public static class RapidRegexExtensions
+    {
+        public static Dictionary<string, string> MatchNamedCaptures(this Regex regex, string input)
+        {
+            var namedCaptureDictionary = new Dictionary<string, string>();
+            GroupCollection groups = regex.Match(input).Groups;
+            string[] groupNames = regex.GetGroupNames();
+            foreach (string groupName in groupNames)
+                if (groups[groupName].Captures.Count > 0)
+                    namedCaptureDictionary.Add(groupName, groups[groupName].Value);
+            return namedCaptureDictionary;
+        }
+    }
+
     public class RegexAliasResolver
     {
         private const string AliasPattern = @"%{\w+}";
@@ -19,6 +33,12 @@ namespace RapidRegex.Core
 
         public string ResolveToRegex(string aliasedPattern)
         {
+            foreach (var alias in _aliases)
+            {
+                var replacePattern = "%{(?<fieldname>" + alias.Name + "):(?<tag_name>\\w*)}";
+                aliasedPattern = Regex.Replace(aliasedPattern, replacePattern, "(?<${tag_name}>%{${fieldname}})", RegexOptions.IgnoreCase);
+            }
+
             foreach (var alias in _aliases)
             {
                 var replacePattern = "%{" + alias.Name + "}";
