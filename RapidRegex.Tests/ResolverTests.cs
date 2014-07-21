@@ -359,5 +359,45 @@ namespace RapidRegex.Tests
             Assert.IsTrue(match1.Success);
             Assert.IsFalse(match2.Success);
         }
+
+         [Test]
+        public void Chained_IP_Address_Test_WihTags1()
+        {
+            var alias = new RegexAlias
+            {
+                Name = "IPDigit",
+                RegexPattern = @"(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"
+            };
+
+            var alias2 = new RegexAlias
+            {
+                Name = "IPAddress",
+                RegexPattern = @"%{IPDigit}\.%{IPDigit}\.%{IPDigit}\.%{IPDigit}"
+            };
+
+            var resolver = new RegexAliasResolver(new[] { alias, alias2 });
+
+            const string pattern = "%{IPAddress:ip1} %{IPAddress:ip2}";
+            const string test1 = "192.168.0.1 192.168.0.2";
+            const string test2 = "555.555.555.555 555.555.555.555";
+
+            var regexPattern = resolver.ResolveToRegex(pattern);
+          
+
+            // Run the regex
+            var match1 = Regex.Match(test1, regexPattern);
+            var match2 = Regex.Match(test2, regexPattern);
+
+            Assert.IsTrue(match1.Success);
+            Assert.IsFalse(match2.Success);
+
+            if (match1.Success)
+            {
+                var regex = new Regex(regexPattern);
+                var namedCaptures = regex.MatchNamedCaptures(test1);
+                Assert.AreEqual(namedCaptures["ip1"], "192.168.0.1");
+                Assert.AreEqual(namedCaptures["ip2"], "192.168.0.2");
+            }
+        }
     }
 }
