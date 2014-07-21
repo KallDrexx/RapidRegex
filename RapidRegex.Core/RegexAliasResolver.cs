@@ -35,14 +35,11 @@ namespace RapidRegex.Core
         {
             foreach (var alias in _aliases)
             {
-                var replacePattern = "%{(?<fieldname>" + alias.Name + "):(?<tag_name>\\w*)}";
-                aliasedPattern = Regex.Replace(aliasedPattern, replacePattern, "(?<${tag_name}>%{${fieldname}})", RegexOptions.IgnoreCase);
-            }
+                var groupedPattern = "%{(?<fieldname>" + alias.Name + "):(?<tag_name>\\w*)}";
+                var nonGroupedPattern = "%{" + alias.Name + "}";
 
-            foreach (var alias in _aliases)
-            {
-                var replacePattern = "%{" + alias.Name + "}";
-                aliasedPattern = Regex.Replace(aliasedPattern, replacePattern, alias.RegexPattern, RegexOptions.IgnoreCase);
+                aliasedPattern = Regex.Replace(aliasedPattern, groupedPattern, "(?<${tag_name}>%{${fieldname}})", RegexOptions.IgnoreCase);
+                aliasedPattern = Regex.Replace(aliasedPattern, nonGroupedPattern, alias.RegexPattern, RegexOptions.IgnoreCase);
             }
 
             return aliasedPattern;
