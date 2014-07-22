@@ -12,14 +12,18 @@ namespace RapidRegex.Core
         {
             var namedCaptureDictionary = new Dictionary<string, string>();
             GroupCollection groups = regex.Match(input).Groups;
-            string[] groupNames = regex.GetGroupNames();
-            foreach (string groupName in groupNames)
-                if (groups[groupName].Captures.Count > 0)
+            
+            // We only want the named ones, not the numbered ones.
+            int[] groupNumbers = regex.GetGroupNumbers();
+            foreach (var groupNumber in groupNumbers)
+            {
+                string groupName = regex.GroupNameFromNumber(groupNumber);
+                if (groupName != groupNumber.ToString() && groups[groupName].Captures.Count > 0)
                     namedCaptureDictionary.Add(groupName, groups[groupName].Value);
+            }
             return namedCaptureDictionary;
         }
     }
-
 
 
     public class RegexAliasResolver
