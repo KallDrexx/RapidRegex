@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using RapidRegex.Core;
+using System.Collections.Generic;
 
 namespace RapidRegex.Tests
 {
@@ -20,7 +21,7 @@ namespace RapidRegex.Tests
                 RegexPattern = @"[0-9]+"
             };
 
-            var resolver = new RegexAliasResolver(new[] {alias});
+            var resolver = new RegexAliasResolver(new[] { alias });
             var pattern = resolver.ResolveToRegex(inputPattern);
 
             Assert.AreEqual(expectedResult, pattern, "Returned pattern was not correct");
@@ -157,7 +158,7 @@ namespace RapidRegex.Tests
         }
 
         [Test]
-        [ExpectedException(typeof (InvalidOperationException))]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void Exception_Thrown_When_Circular_Alias_Dependency_Exists()
         {
             var alias = new RegexAlias
@@ -178,7 +179,7 @@ namespace RapidRegex.Tests
                 RegexPattern = @"%{test1}"
             };
 
-            new RegexAliasResolver(new[] {alias, alias2, alias3});
+            new RegexAliasResolver(new[] { alias, alias2, alias3 });
         }
 
         [Test]
@@ -316,7 +317,7 @@ namespace RapidRegex.Tests
             const string pattern = "connection from %{IPAddress}";
             const string test1 = "connection from 192.168.0.1";
             const string test2 = "connection from 555.555.555.555";
-            
+
             // Resolve the pattern into becomes "connection from \b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b"
             var regexPattern = resolver.ResolveToRegex(pattern);
 
@@ -360,7 +361,7 @@ namespace RapidRegex.Tests
             Assert.IsFalse(match2.Success);
         }
 
-         [Test]
+        [Test]
         public void Chained_IP_Address_Test_WihTags1()
         {
             var alias = new RegexAlias
@@ -382,7 +383,7 @@ namespace RapidRegex.Tests
             const string test2 = "555.555.555.555 555.555.555.555";
 
             var regexPattern = resolver.ResolveToRegex(pattern);
-          
+
 
             // Run the regex
             var match1 = Regex.Match(test1, regexPattern);
@@ -394,7 +395,7 @@ namespace RapidRegex.Tests
             if (match1.Success)
             {
                 var regex = new Regex(regexPattern);
-                var namedCaptures = regex.MatchNamedCaptures(test1);
+                var namedCaptures = regex.MatchNamedCaptures(test1);               
                 Assert.AreEqual(namedCaptures["ip1"], "192.168.0.1");
                 Assert.AreEqual(namedCaptures["ip2"], "192.168.0.2");
             }

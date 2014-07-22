@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -19,6 +20,8 @@ namespace RapidRegex.Core
         }
     }
 
+
+
     public class RegexAliasResolver
     {
         private const string AliasPattern = @"%{\w+}";
@@ -28,21 +31,33 @@ namespace RapidRegex.Core
         public RegexAliasResolver(IEnumerable<RegexAlias> regexAliases)
         {
             _aliases = (regexAliases ?? new RegexAlias[0]).Where(x => x != null).ToArray();
-            CompileDependentAliases();
+            CompileDependentAliases();            
         }
+
 
         public string ResolveToRegex(string aliasedPattern)
         {
-            foreach (var alias in _aliases)
-            {
-                var replacePattern = "%{(?<fieldname>" + alias.Name + "):(?<tag_name>\\w*)}";
-                aliasedPattern = Regex.Replace(aliasedPattern, replacePattern, "(?<${tag_name}>%{${fieldname}})", RegexOptions.IgnoreCase);
-            }
+            var tokenRe = new Regex("%{\\w+(:)?(\\w+)}");
 
-            foreach (var alias in _aliases)
+            bool hasNamedFields = tokenRe.Match(aliasedPattern).Success;
+            while (hasNamedFields)
             {
-                var replacePattern = "%{" + alias.Name + "}";
-                aliasedPattern = Regex.Replace(aliasedPattern, replacePattern, alias.RegexPattern, RegexOptions.IgnoreCase);
+                var startingPattern = aliasedPattern;
+                foreach (var alias in _aliases)
+                {
+                    var replacePattern = "%{(?<fieldname>" + alias.Name + "):(?<tag_name>\\w*)}";
+                    aliasedPattern = Regex.Replace(aliasedPattern, replacePattern, "(?<${tag_name}>%{${fieldname}})",
+                        RegexOptions.IgnoreCase);
+                }
+
+                foreach (var alias in _aliases)
+                {
+                    var replacePattern = "%{" + alias.Name + "}";
+                    aliasedPattern = Regex.Replace(aliasedPattern, replacePattern, alias.RegexPattern,
+                        RegexOptions.IgnoreCase);
+                }
+                // Continue while we resolve down, unless we hit bottom or there are now more aliases.
+                hasNamedFields = tokenRe.Match(aliasedPattern).Success && startingPattern != aliasedPattern;
             }
 
             return aliasedPattern;
@@ -94,4 +109,28 @@ namespace RapidRegex.Core
                         .Distinct();
         }
     }
+
+
+
+    public class RegexGrokResolver : RegexAliasResolver
+    {
+        private const string AliasPattern = @"%{\w+}";
+
+       
+        public RegexGrokResolver() : base(BasicAliasConfigReader.ParseStream(StreamFromString(Properties.Resources.GrokBaseAliases)))
+        {    
+            
+        }
+
+        private static Stream StreamFromString(string s)
+        {
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
+    }
+
 }

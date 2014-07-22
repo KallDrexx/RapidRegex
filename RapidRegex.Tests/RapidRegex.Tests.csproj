@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BasicAliasConfigReaderTests.cs" />
+    <Compile Include="GrokTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResolverTests.cs" />
   </ItemGroup>
