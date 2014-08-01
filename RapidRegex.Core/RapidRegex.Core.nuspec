@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>RapidRegex.Core</id>
+    <version>1.0.0.2</version>
+    <title>RapidRegex.Core</title>
+    <authors>efontana</authors>
+    <owners>kalldrexx</owners>    
+    <projectUrl>https://github.com/KallDrexx/RapidRegex</projectUrl>    
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Grok like Regular expressions</description>
+    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+    <copyright>Copyright 2014</copyright>
+    <tags>Tag1 Tag2</tags>
+  </metadata>
+</package>
